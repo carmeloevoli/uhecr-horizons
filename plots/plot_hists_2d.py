@@ -87,9 +87,5 @@ def plot_hists_2D(ID_min = H1, figname = 'UF2024'):
     savefig(fig, figname)
 
 if __name__ == '__main__':
-    # plot_hists_2D(H1, 'UF2024_all.pdf')
-    # plot_hists_2D(He4, 'UF2024_He.pdf')
-    # plot_hists_2D(N14, 'UF2024_C.pdf')
-    # plot_hists_2D(Si28, 'UF2024_Si.pdf')
-    plot_hists_2D(Fe56, 'UF2024_Fe.pdf')
+    plot_hists_2D(H1, 'UF2024_all.pdf')
     
