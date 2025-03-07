@@ -1,22 +1,26 @@
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import set_axes, savefig
+from utils import set_axes, savefig, nucleusID
 
 # Configure Matplotlib backend
 matplotlib.use('MacOSX')
 plt.style.use('simprop.mplstyle')
 
-# H = 1000010010
-# He = 1000020040
-# C = 1000060120
-# N = 1000070140
-# O = 1000080160
-# Si = 1000140280  
-# Fe = 1000260560
+# Nuclei
+H1 = nucleusID(1, 1)
+He4 = nucleusID(2, 2)
+N14 = nucleusID(7, 14)
+Si28 = nucleusID(14, 28)
+Fe56 = nucleusID(26, 56)
 
-def get_hist(filename, E_max, range=[1, 4], bins=100):
+def get_hist(filename, E_max, ID_min, range=[1, 4], bins=100):
     ID, E, E_source = np.loadtxt(filename, unpack=True, usecols=(2, 3, 6))
+    i = np.where(ID >= ID_min)
+    ID = ID[i]
+    E = E[i]
+    E_source = E_source[i]
+
     w = np.exp(-E_source / E_max)
     
     print(f'E range : {min(E)} - {max(E)} EeV')
@@ -28,9 +32,12 @@ def get_hist(filename, E_max, range=[1, 4], bins=100):
 def plot_hists():
     def plot_single_hist(i, E_max, color):
         distance = np.logspace(np.log10(1.), np.log10(300.), 300)[i]
-        hist, bin_edges = get_hist(f'sims/crpropa_events_56_26_{i}_10000.txt', E_max)
+        hist, bin_edges = get_hist(f'sims/crpropa_events_56_26_{i}_10000.txt', E_max, H1)
         ax.hist(bin_edges[:-1], bins=bin_edges, weights=hist, 
                 lw=2.5, histtype='step', color=color, label=f'{distance:.1f} Mpc')
+        hist, bin_edges = get_hist(f'sims/crpropa_events_56_26_{i}_10000.txt', E_max, Si28)
+        ax.hist(bin_edges[:-1], bins=bin_edges, weights=hist,
+            lw=2.5, histtype='stepfilled', color=color, alpha=0.15)
 
     fig, ax = plt.subplots(figsize=(13.5, 8.5))
     xlabel, ylabel = r'log$_{10}$ (E / EeV)', r'PDF'

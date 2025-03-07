@@ -56,25 +56,15 @@ def set_axes(ax: plt.Axes, xlabel: str, ylabel: str, xscale: str = 'linear', ysc
     if ylim:
         ax.set_ylim(ylim)
 
-def find_first_peaks(x, y, npeaks=3):
+def nucleusID(A: int, Z: int):
     """
-    Identify the first N peaks in the data.
+    Calculate the nucleus ID from the atomic number (Z) and mass number (A).
     
     Parameters:
-        x (np.ndarray): Array of x values.
-        y (np.ndarray): Array of y values.
-        npeaks (int): Number of peaks to identify (default: 3).
+    - A: Mass number of the nucleus.
+    - Z: Atomic number of the nucleus.
     
     Returns:
-        tuple: (peak_positions, first_peaks)
+    - The nucleus ID
     """
-    peaks, _ = find_peaks(y)
-    
-    if len(peaks) < npeaks:
-        print(f"Warning: Only {len(peaks)} peaks found, expected {npeaks}.")
-        npeaks = len(peaks)
-    
-    first_peaks = peaks[:npeaks]
-    peak_positions = x[first_peaks]
-    
-    return peak_positions, first_peaks
+    return 1000000000 + A * 10000 + Z * 10
