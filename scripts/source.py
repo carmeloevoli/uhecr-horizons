@@ -1,8 +1,10 @@
-def source(energy_range, id_nucles, size=10000):
+import numpy as np
+from crpropa import *
+
+def run(energy_range, name_nucleus, id_nucleus, size=10000):
     energy_min, energy_max = energy_range
-    A, Z = id_nucles
    
-    filename = f'crpropa_events_{A}_{Z}_source_{size}.txt'
+    filename = f'crpropa_events_{name}_source_{size}.txt'
 
     # Simulation setup
     sim = ModuleList()
@@ -16,24 +18,29 @@ def source(energy_range, id_nucles, size=10000):
     obs.onDetection(output)
     sim.add(obs)
 
-#    # Source
-#    source = Source()
-#    source.add(SourcePosition(10. * kpc))
-#    source.add(SourceRedshift1D())
-
     # Source
     source = Source()
     source.add(SourcePosition(10. * kpc))
     source.add(SourceRedshift1D())
     source.add(SourcePowerLawSpectrum(energy_min, energy_max, -1))
-    source.add(SourceParticleType(nucleusId(A, Z)))
+    source.add(SourceParticleType(id_nucleus))
     
-    # Power law spectrum
-    # composition = SourceComposition(energy_min, energy_max, -1)
-    # composition.add(A, Z, 1)
-    # source.add(composition)
-
     # Run simulation
     sim.setShowProgress(True)
     sim.run(source, size, True)
     output.close()
+
+if __name__ == "__main__":
+    energy_range = [1e2 * EeV, 1e4 * EeV]
+    size = 100000
+    
+    nuclei = {
+        "H": nucleusId(1, 1),
+        "He": nucleusId(4, 2),
+        "N": nucleusId(14, 7),
+        "Si": nucleusId(28, 14),
+        "Fe": nucleusId(56, 26),
+    }
+
+    for name, id in nuclei.items():
+        run(energy_range, name, id, size)

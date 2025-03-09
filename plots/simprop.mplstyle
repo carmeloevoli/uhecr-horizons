@@ -1,4 +1,7 @@
-#https://matplotlib.org/tutorials/introductory/customizing.html
+# Custom Matplotlib style
+# Reference: https://matplotlib.org/tutorials/introductory/customizing.html
+
+# Axes
 axes.labelsize : 28
 axes.labelpad : 10
 axes.linewidth : 1.75
@@ -8,22 +11,36 @@ axes.spines.top : True
 axes.spines.right : True
 axes.titlesize : 25
 axes.formatter.min_exponent : 2
+
+# Errorbars
 errorbar.capsize : 3
+
+# Figure
 figure.autolayout : True
-figure.figsize : 7., 6.4
+figure.figsize : 8, 6  # slightly wider
+
+# Font
 font.family : serif
 font.serif : Palatino
 font.size : 28
-font.weight : 900
+font.weight : bold  # corrected from 900 to bold (700)
+
+# Legend
 legend.fancybox : False
 legend.fontsize : 22
 legend.frameon : False
 legend.numpoints : 1
 legend.loc : best
+
+# Lines and markers
 lines.linewidth : 3
 lines.markersize : 6
+
+# LaTeX settings
 text.usetex : True
 text.latex.preamble : \usepackage{amsmath}\usepackage{amssymb}
+
+# Ticks
 xtick.direction : in
 xtick.labelsize : 28
 xtick.major.pad : 10
@@ -34,6 +51,7 @@ xtick.minor.width : 1.0
 xtick.minor.visible : True
 xtick.top : True
 xtick.bottom : True
+
 ytick.direction : in
 ytick.labelsize : 28
 ytick.major.pad : 10
@@ -44,3 +62,9 @@ ytick.minor.width : 1.0
 ytick.minor.visible : True
 ytick.left : True  
 ytick.right : True 
+
+# PDF output
+pdf.fonttype : 42  
+
+# Saving figures
+savefig.dpi : 300

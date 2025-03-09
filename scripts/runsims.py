@@ -1,17 +1,17 @@
 import numpy as np
 from crpropa import *
 
-NDISTANCES = 300
+NDISTANCES = 100
 
-def run(i, energy_range, id_nucles, size=10000):
+# Reference https://crpropa.github.io/CRPropa3/pages/example_notebooks/sim1D/sim1D.html
+def run(i, energy_range, name_nucleus, id_nucles, size=10000):
     energy_min, energy_max = energy_range
-    A, Z = id_nucles
     
     # Compute distance dynamically
-    distance = np.logspace(np.log10(0.1), np.log10(300.), NDISTANCES)[i] * Mpc
-    filename = f'crpropa_events_{A}_{Z}_{i}_{size}.txt'
+    distance = np.logspace(np.log10(1.), np.log10(200.), NDISTANCES)[i] * Mpc
+    filename = f'crpropa_events_{name_nucleus}_{i}_{size}.txt'
     
-    print(f'D : {distance / Mpc:8.3f}')
+    print(f'fraction : {i} - D : {distance / Mpc:8.3f}')
     
     # Simulation setup
     sim = ModuleList()
@@ -39,7 +39,7 @@ def run(i, energy_range, id_nucles, size=10000):
     source.add(SourcePosition(distance))
     source.add(SourceRedshift1D())
     source.add(SourcePowerLawSpectrum(energy_min, energy_max, -1))
-    source.add(SourceParticleType(nucleusId(A, Z)))
+    source.add(SourceParticleType(id_nucles))
 
     # Run simulation
     sim.setShowProgress(True)
@@ -48,16 +48,16 @@ def run(i, energy_range, id_nucles, size=10000):
 
 if __name__ == "__main__":
     energy_range = [1e2 * EeV, 1e4 * EeV]
-    size = 10000
+    size = 100000
     
     nuclei = {
-        "H": [1, 1],
-        "He": [4, 2],
-        "N": [14, 7],
-        "Si": [28, 14],
-        "Fe": [56, 26]
+        "H": nucleusId(1, 1),
+        "He": nucleusId(4, 2),
+        "N": nucleusId(14, 7),
+        "Si": nucleusId(28, 14),
+        "Fe": nucleusId(56, 26),
     }
 
-    for name, nucleon in nuclei.items():
+    for name, id in nuclei.items():
         for i in range(NDISTANCES):
-            run(i, energy_range, nucleon, size)
+            run(i, energy_range, name, id, size)
