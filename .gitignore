@@ -1,0 +1,5 @@
+scratch
+*__pycache__/
+*.DS_Store
+plots/sims
+plots/figs/*.pdf
