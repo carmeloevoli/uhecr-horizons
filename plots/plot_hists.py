@@ -14,46 +14,58 @@ N14 = nucleusID(7, 14)
 Si28 = nucleusID(14, 28)
 Fe56 = nucleusID(26, 56)
 
-def get_hist(filename, E_max, ID_min, range=[1, 4], bins=100):
+# identify mass groups
+# idx1 = A == 1
+# idx2 = (A > 1) * (A <= 7)
+# idx3 = (A > 7) * (A <= 28)
+# idx4 = (A > 28)
+
+def get_hist(filename, E_source_cutoff, ID_range, bins=60):
     ID, E, E_source = np.loadtxt(filename, unpack=True, usecols=(2, 3, 6))
-    i = np.where(ID >= ID_min)
+    ID_min, ID_max = ID_range
+    i = np.where((ID >= ID_min) * (ID <= ID_max))
     ID = ID[i]
-    E = E[i]
-    E_source = E_source[i]
+    E = E[i] / 1e2 # 10^20 eV
+    E_source = E_source[i] / 1e2 # 10^20 eV
 
-    w = np.exp(-E_source / E_max)
+    w = np.exp(-E_source / E_source_cutoff)
     
-    print(f'E range : {min(E)} - {max(E)} EeV')
-    print(f'size : {len(E)/1000} k')
-
-    hist, bin_edges = np.histogram(np.log10(E), weights=w, bins=100, range=range)
+    hist, bin_edges = np.histogram(E, weights=w, bins=100, range=[1, 4])
     return hist, bin_edges
 
 def plot_hists():
-    def plot_single_hist(i, E_max, color):
-        distance = np.logspace(np.log10(1.), np.log10(300.), 300)[i]
-        hist, bin_edges = get_hist(f'sims/crpropa_events_56_26_{i}_10000.txt', E_max, H1)
-        ax.hist(bin_edges[:-1], bins=bin_edges, weights=hist, 
-                lw=2.5, histtype='step', color=color, label=f'{distance:.1f} Mpc')
-        hist, bin_edges = get_hist(f'sims/crpropa_events_56_26_{i}_10000.txt', E_max, Si28)
-        ax.hist(bin_edges[:-1], bins=bin_edges, weights=hist,
-            lw=2.5, histtype='stepfilled', color=color, alpha=0.15)
-
     fig, ax = plt.subplots(figsize=(13.5, 8.5))
     xlabel, ylabel = r'log$_{10}$ (E / EeV)', r'PDF'
-    set_axes(ax, xlabel, ylabel, xscale='linear', yscale='log', xlim=[1, 3.5], ylim=[1e-2, 1e2])
+    set_axes(ax, xlabel, ylabel, xscale='linear', yscale='log', xlim=[1, 4]) # , ylim=[1e-2, 1e3])
 
-    Z = 26.
-    E_max = np.power(10., 0.6) * Z # EeV
+    E_max = np.power(10., 18.6 - 20.) * 26. # 10^20 eV
 
-    models = ((0, 'tab:olive'), 
-              (50, 'tab:orange'), 
-              (100, 'tab:red'), 
-              (150, 'tab:blue'), 
-              (200, 'tab:purple'))
-    
-    for i, color in models:
-        plot_single_hist(i, E_max, color)
+    hist_light = []
+    hist_intermediate = []
+    hist_heavy = []
+    bin_edges = None
+
+    NDISTANCES = 10
+
+    for i in range(NDISTANCES):
+        print(f'processing {i}')
+        filename = f'sims/crpropa_events_Fe_{i}_100000.txt'
+        hist, bin_edges = get_hist(filename, E_max, (H1, N14))
+        hist_light.append(hist)
+
+        hist, bin_edges = get_hist(filename, E_max, (H1, Si28))
+        hist_intermediate.append(hist)
+
+        hist, bin_edges = get_hist(filename, E_max, (H1, Fe56))
+        hist_heavy.append(hist)
+
+    hist_light = np.array(hist_light)
+    hist_intermediate = np.array(hist_intermediate)
+    hist_heavy = np.array(hist_heavy)
+
+    ax.hist(bin_edges[:-1], bins=bin_edges, weights=np.mean(hist_light, axis=0), lw=2.5, histtype='stepfilled', alpha=0.25, color='r', label='H1-N14')
+    ax.hist(bin_edges[:-1], bins=bin_edges, weights=np.mean(hist_intermediate, axis=0), lw=2.5, histtype='stepfilled', alpha=0.25, color='b', label='N14-Si28')
+    ax.hist(bin_edges[:-1], bins=bin_edges, weights=np.mean(hist_heavy, axis=0), lw=2.5, histtype='stepfilled', alpha=0.25, color='g', label='Si28-Fe56') 
 
     ax.legend()
     savefig(fig, f'hists.pdf')

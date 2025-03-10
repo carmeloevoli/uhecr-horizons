@@ -30,7 +30,7 @@ def get_hist(filename, E_source_cutoff, E_observed, dE_observed, ID_min = H1, ra
 
 def plot_horizon(ID_min = H1, model = 'crpropa_events_56_26', figname = 'horizon'):
     fig, ax = plt.subplots(figsize=(13.5, 8.5), dpi=300)  # High DPI for better resolution
-    set_axes(ax, 'Distance [Mpc]', 'attenuation', xscale='log', yscale='linear', xlim=[1., 200.], ylim=[0., 3.])
+    set_axes(ax, 'Distance [Mpc]', 'attenuation', xscale='log', yscale='linear', xlim=[1., 200.], ylim=[0., 2.])
 
     ndistances = 100
     distances = np.logspace(np.log10(1.), np.log10(200.), ndistances)
@@ -38,18 +38,19 @@ def plot_horizon(ID_min = H1, model = 'crpropa_events_56_26', figname = 'horizon
     cutoff_energy = 26. * np.power(10., 18.6 - 20.) # 10^20 eV
 
     horizon_lo = []
+    norm_lo = get_hist(f'sims/{model}_source_100000.txt', cutoff_energy, 1.25, 0.10, ID_min=ID_min)
+    
     horizon_hi = []
-
-    norm = get_hist(f'sims/{model}_source_100000.txt', cutoff_energy, 1.66, 0.13, ID_min=ID_min)
+    norm_hi = get_hist(f'sims/{model}_source_100000.txt', cutoff_energy, 1.66, 0.13, ID_min=ID_min)
 
     for i in range(ndistances):
         print(f'processing {i}')
         filename = f'sims/{model}_{i}_100000.txt'
-        h = get_hist(filename, cutoff_energy, 1.66, 0.13, ID_min=ID_min)
-        horizon_hi.append(h / norm)
         h = get_hist(filename, cutoff_energy, 1.25, 0.10, ID_min=ID_min)
-        horizon_lo.append(h / norm)
-    
+        horizon_lo.append(h / norm_lo)
+        h = get_hist(filename, cutoff_energy, 1.66, 0.13, ID_min=ID_min)
+        horizon_hi.append(h / norm_hi)
+
     ax.plot(distances, horizon_hi, lw=3, color='tab:blue', label='PAO191110')
     ax.plot(distances, horizon_lo, lw=3, color='gold', label='PAO150825')
 
