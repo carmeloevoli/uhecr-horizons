@@ -25,7 +25,7 @@ def load_data(filename):
 
 def plot_events(filename = '../data/auger_catalog_SD.csv', figname = 'events.pdf'):
     fig, ax = plt.subplots(figsize=(13.5, 8.5), dpi=300)  # High DPI for better resolution
-    set_axes(ax, r'E [$10^{20}$ eV]', '$\phi$ [radians]', xscale='linear', yscale='linear', xlim=[1.0, 1.9], ylim=[-np.pi, np.pi])
+    set_axes(ax, r'E [$10^{20}$ eV]', '$\phi$ [radians]', xscale='linear', yscale='linear', xlim=[0.3, 1.9], ylim=[-np.pi, np.pi])
 
     # Load data
     energy, denergy, phi = load_data(filename)
@@ -36,8 +36,13 @@ def plot_events(filename = '../data/auger_catalog_SD.csv', figname = 'events.pdf
 
     # Add Fe max energy
     E_max = 26. * np.power(10., 0.6) # EeV
-    ax.axvline(E_max / 1e2, color='tab:red', linestyle='--', linewidth=2.5, label='$26 E_{\rm max}$')
-    ax.text(1.02 * E_max / 1e2, -2.2, r'$26 E_{\rm max}$', fontsize=20, color='tab:red', ha='center', va='center', rotation=90)
+    ax.axvline(E_max / 1e2, color='tab:red', linestyle='--', linewidth=2.5, label='$26 R_{\rm cut}$ (UF2024)')
+    ax.text(E_max / 1e2 - 0.03, -1.2, r'$26 R_{\rm cut}$ (UF2024)', fontsize=20, color='tab:red', ha='center', va='center', rotation=90)
+
+    # Add Fe max energy (combined fit)
+    E_max = 26. * np.power(10., 0.2) # EeV
+    ax.axvline(E_max / 1e2, color='tab:orange', linestyle='--', linewidth=2.5, label='$26 R_{\rm cut}$ (combined fit)')
+    ax.text(E_max / 1e2 - 0.03, -1.2, r'$26 R_{\rm cut}$ (combined fit)', fontsize=20, color='tab:orange', ha='center', va='center', rotation=90)
 
     colors = [
         'tab:blue', 'tab:purple', 'tab:cyan', 'tab:green', 'tab:olive',
@@ -46,7 +51,6 @@ def plot_events(filename = '../data/auger_catalog_SD.csv', figname = 'events.pdf
 
     for i in range(11):
         print(f'{names[i]} {energy[i]:.2f} {denergy[i]:.2f} {phi[i]:.5f}')
-        #ax.text(energy[i], phi[i] - 0.2, f'{energy[i]:.2f}', fontsize=14, color=colors[i], ha='center', va='center')   
         ax.text(energy[i], phi[i] - 0.2, f'{names[i]}', fontsize=14, color=colors[i], ha='center', va='center')
         add_events(ax, energy[i], phi[i], denergy[i], color=colors[i])
 
