@@ -68,4 +68,3 @@ def plot_rigidity(ID_min = H1, model = 'crpropa_events_56_26', figname = 'rigidi
 
 if __name__ == '__main__':
     plot_rigidity(H1, model = 'crpropa_events_Fe', figname = 'rigidity.pdf')
-    

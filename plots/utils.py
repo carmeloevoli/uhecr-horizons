@@ -68,3 +68,15 @@ def nucleusID(A: int, Z: int):
     - The nucleus ID
     """
     return 1000000000 + A * 10000 + Z * 10
+
+def getChargeFromID(ID: int):
+    """
+    Extract the nuclear charge (Z) from the given nucleus ID.
+
+    Parameters:
+    - ID: Nucleus ID from which to extract the charge.
+
+    Returns:
+    - The nuclear charge (Z).
+    """
+    return np.floor((ID / 10000) % 1000)
