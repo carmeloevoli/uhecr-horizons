@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from utils import set_axes, savefig
-
+from load_sim import load_sim
 # Configure Matplotlib backend
 matplotlib.use('MacOSX')
 plt.style.use('simprop.mplstyle')
@@ -82,33 +82,15 @@ def plot_combined_fit_highenergy(figname='combined_fit_highenergy.pdf'):
     savefig(fig, figname)
 
 def get_hist(filename, L, Z, bins=60):
-    ID, E, E_source = np.loadtxt(filename, unpack=True, usecols=(2, 3, 6))
-    E /= 1e2 # 10^20 eV
-    E_source /= 1e2 # 10^20 eV
+    ID_obs, E_obs, Z_obs, w_uf24, w_cf = load_sim(filename, Z, L)
 
-    E_0 = 1e-2
-    gamma = -1.47
-    E_min = np.power(10., 17.8 - 20.) # 10^20 eV
-    E_cut = Z * np.power(10., 18.19 - 20.) # 10^20 eV
-    I = 1. / (2. - gamma) * (np.power(E_cut / E_0, 2. - gamma) - np.power(E_min / E_0, 2. - gamma))
-    w_0 = L / E_0**2 / I
-
-    w = [w_0 * (_E / E_0) ** (-gamma + 1) * (np.exp(1 - _E / E_cut) if _E >= E_cut else 1) for _E in E_source]
-    
-    hist, bin_edges = np.histogram(E, weights=w, bins=100, range=[1, 10], density=True)
+    hist, bin_edges = np.histogram(E_obs, weights=w_cf, bins=100, range=[1, 10], density=True)
     print(np.sum(hist * np.diff(bin_edges)))
     return hist, bin_edges
 
 def plot_combined_fit_histo(figname='combined_fit_histo.pdf'):
     fig, ax = plt.subplots(figsize=(13.5, 8.5), dpi=300)  # High DPI for better resolution
     set_axes(ax, 'E [$10^{20}$ eV]', 'dN/dE', xscale='linear', yscale='linear', xlim=[1, 3]) # , ylim=[1e-8, 1e1])
-
-    # Load the source spectrum
-    # E, Q_He, Q_N, Q_Si, Q_Fe, A = get_source(np.linspace(1e20, 10e20, 1000))
-
-    # ax.plot(E / 1e20, Q_N, color='tab:green', label='N')
-    # ax.plot(E / 1e20, Q_Si, color='tab:cyan', label='Si')
-    # ax.plot(E / 1e20, Q_Fe, color='tab:blue', label='Fe')
 
     # Load the source histogram
     hist, bin_edges = get_hist('sims/crpropa_events_N_source_1000000.txt', 0.681, 7.)
@@ -130,6 +112,6 @@ def plot_combined_fit_histo(figname='combined_fit_histo.pdf'):
     savefig(fig, figname)
 
 if __name__ == '__main__':
-    #plot_combined_fit() 
+    plot_combined_fit() 
     plot_combined_fit_highenergy()
-    #plot_combined_fit_histo()
+    plot_combined_fit_histo()
