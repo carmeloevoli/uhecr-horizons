@@ -31,8 +31,8 @@ def run(energy_range, name_nucleus, id_nucleus, size=10000):
     output.close()
 
 if __name__ == "__main__":
-    energy_range = [1e2 * EeV, 1e4 * EeV]
-    size = 100000
+    energy_range = [1e2 * EeV, 1e3 * EeV]
+    size = 1000000
     
     nuclei = {
         "H": nucleusId(1, 1),
