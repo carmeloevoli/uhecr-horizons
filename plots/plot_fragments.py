@@ -46,7 +46,18 @@ def get_fragments_CF(E_event, dE_event, ID_min = H1):
     hist, bin_edges = np.histogram(Z, weights=w, bins=26, range=[0.5, 26.5])
     return hist, bin_edges
 
-def plot_fragments(model = 'crpropa_events', figname = 'fragments.pdf'):
+def print_fragments(E_event, txtname = 'fragments.txt'):
+    energy_resolution = 0.08
+    hist, bin_edges = get_fragments_CF(E_event, energy_resolution * E_event)
+    x = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    hist = hist / np.sum(hist)
+    with open(txtname, 'w') as f:
+        f.write('# Z Probability\n')
+        for i in range(len(hist)):
+            f.write(f'{int(x[i])} {hist[i]:.4e}\n')
+    print(f'Wrote {txtname} for {E_event:.2f} energy and with {len(hist)} entries')
+
+def plot_fragments(figname = 'fragments.pdf'):
     fig, ax = plt.subplots(figsize=(13.5, 8.5), dpi=300)  # High DPI for better resolution
     set_axes(ax, 'Z', 'Probability', xscale='linear', yscale='linear', xlim=[0, 27], ylim=[0, 0.4])
 
@@ -74,4 +85,7 @@ def plot_fragments(model = 'crpropa_events', figname = 'fragments.pdf'):
     savefig(fig, figname)
 
 if __name__ == '__main__':
-    plot_fragments(model = 'crpropa_events_Fe', figname = 'fragments.pdf') 
+    for i in np.arange(1.0, 2.0, 0.01):
+        print_fragments(i, f'fragments_CF2023_{i:.2f}.txt')
+
+    #plot_fragments(model = 'crpropa_events_Fe', figname = 'fragments.pdf') 
